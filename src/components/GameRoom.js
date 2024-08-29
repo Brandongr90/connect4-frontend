@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Text, VStack, HStack, Button } from '@chakra-ui/react';
+import { Box, Text, VStack, Flex, Button, Heading, Grid, Alert, AlertIcon, AlertTitle, AlertDescription, Icon } from '@chakra-ui/react';
+import { MdLogout } from 'react-icons/md'
 import Connect4Board from './Connect4Board';
 
 const GameRoom = ({ socket, roomName, playerName, onLeaveRoom }) => {
@@ -40,29 +41,41 @@ const GameRoom = ({ socket, roomName, playerName, onLeaveRoom }) => {
     const currentPlayerName = roomData.players[roomData.game.currentPlayer]?.name;
 
     return (
-        <Box maxWidth="600px" margin="auto" mt={8}>
-            <VStack spacing={4} align="stretch">
-                <HStack justifyContent="space-between">
-                    <Text fontSize="xl" fontWeight="bold">
-                        Room: {roomName}
-                    </Text>
-                    <Button onClick={onLeaveRoom} colorScheme="red" size="sm">
+        <Box maxWidth="700px" margin="auto" mt={8} p={6} borderRadius="xl" boxShadow="xl" bg="white">
+            <VStack spacing={6} align="stretch">
+                <Flex justifyContent="space-between" alignItems="center">
+                    <Heading fontSize="2xl" color="brand.500">Room: {roomName}</Heading>
+                    <Button onClick={onLeaveRoom} colorScheme="red" size="sm" leftIcon={<Icon as={MdLogout} />}>
                         Leave Room
                     </Button>
-                </HStack>
-                <HStack justifyContent="space-between">
-                    <Text>Players: {roomData.players.map(p => p.name).join(', ')}</Text>
-                    <Text>Spectators: {roomData.spectators.map(s => s.name).join(', ')}</Text>
-                </HStack>
+                </Flex>
+                <Grid templateColumns="1fr 1fr" gap={4}>
+                    <Box>
+                        <Text fontWeight="bold">Players:</Text>
+                        <Text>{roomData.players.map(p => p.name).join(', ')}</Text>
+                    </Box>
+                    <Box>
+                        <Text fontWeight="bold">Spectators:</Text>
+                        <Text>{roomData.spectators.map(s => s.name).join(', ')}</Text>
+                    </Box>
+                </Grid>
                 {gameOver ? (
-                    <Text fontSize="2xl" fontWeight="bold" textAlign="center">
-                        {gameOver}
-                    </Text>
+                    <Alert status="success" variant="subtle" flexDirection="column" alignItems="center" justifyContent="center" textAlign="center" height="200px">
+                        <AlertIcon boxSize="40px" mr={0} />
+                        <AlertTitle mt={4} mb={1} fontSize="lg">
+                            Game Over!
+                        </AlertTitle>
+                        <AlertDescription maxWidth="sm">
+                            {gameOver}
+                        </AlertDescription>
+                    </Alert>
                 ) : (
-                    <Text fontSize="xl" textAlign="center">
-                        Current player: {currentPlayerName}
-                        {currentPlayerName === playerName && " (You)"}
-                    </Text>
+                    <Box textAlign="center" p={4} bg="brand.50" borderRadius="md">
+                        <Text fontSize="xl" fontWeight="bold">
+                            Current player: {currentPlayerName}
+                            {currentPlayerName === playerName && " (You)"}
+                        </Text>
+                    </Box>
                 )}
                 <Connect4Board
                     board={roomData.game.board}
@@ -70,9 +83,11 @@ const GameRoom = ({ socket, roomName, playerName, onLeaveRoom }) => {
                     currentPlayer={isPlayer ? roomData.game.currentPlayer : null}
                 />
                 {!isPlayer && (
-                    <Text fontSize="lg" textAlign="center">
-                        You are a spectator
-                    </Text>
+                    <Box textAlign="center" p={4} bg="gray.100" borderRadius="md">
+                        <Text fontSize="lg" fontWeight="bold">
+                            You are a spectator
+                        </Text>
+                    </Box>
                 )}
             </VStack>
         </Box>

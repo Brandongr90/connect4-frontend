@@ -1,9 +1,25 @@
 import React, { useState, useEffect } from 'react';
-import { ChakraProvider, Box, VStack, Heading, Text } from '@chakra-ui/react';
+import { ChakraProvider, Box, VStack, Heading, Container, Alert, AlertIcon, AlertTitle, AlertDescription } from '@chakra-ui/react';
 import io from 'socket.io-client';
 import Login from './components/Login';
 import RoomList from './components/RoomList';
 import GameRoom from './components/GameRoom';
+import { extendTheme } from "@chakra-ui/react";
+
+const theme = extendTheme({
+  fonts: {
+    heading: "'Roboto', sans-serif",
+    body: "'Roboto', sans-serif",
+  },
+  colors: {
+    brand: {
+      50: "#E6FFFA",
+      100: "#B2F5EA",
+      500: "#319795",
+      900: "#234E52",
+    },
+  },
+});
 
 const socket = io('http://localhost:5001', {
   transports: ['websocket'],
@@ -53,27 +69,36 @@ function App() {
     console.log('Leaving room:', currentRoom);
     socket.emit('leaveRoom', currentRoom);
     setCurrentRoom(null);
+    socket.emit('getRoomList');
   };
 
   return (
-      <ChakraProvider>
-        <Box textAlign="center" fontSize="xl">
-          <VStack spacing={8} p={8}>
-            <Heading>Connect 4 Online</Heading>
-            {!isConnected && <Text color="red.500">Disconnected from server</Text>}
-            {!playerName && <Login onLogin={handleLogin} />}
-            {playerName && !currentRoom && (
-                <RoomList socket={socket} onJoinRoom={handleJoinRoom} playerName={playerName} />
-            )}
-            {playerName && currentRoom && (
-                <GameRoom
-                    socket={socket}
-                    roomName={currentRoom}
-                    playerName={playerName}
-                    onLeaveRoom={handleLeaveRoom}
-                />
-            )}
-          </VStack>
+      <ChakraProvider theme={theme}>
+        <Box minHeight="100vh" bg="gray.50">
+          <Container maxWidth="container.xl" centerContent py={8}>
+            <VStack spacing={8}>
+              <Heading as="h1" size="2xl" color="brand.500">Connect 4</Heading>
+              {!isConnected && (
+                  <Alert status="error">
+                    <AlertIcon />
+                    <AlertTitle mr={2}>Disconnected from server</AlertTitle>
+                    <AlertDescription>Please check your internet connection.</AlertDescription>
+                  </Alert>
+              )}
+              {!playerName && <Login onLogin={handleLogin} />}
+              {playerName && !currentRoom && (
+                  <RoomList socket={socket} onJoinRoom={handleJoinRoom} playerName={playerName} />
+              )}
+              {playerName && currentRoom && (
+                  <GameRoom
+                      socket={socket}
+                      roomName={currentRoom}
+                      playerName={playerName}
+                      onLeaveRoom={handleLeaveRoom}
+                  />
+              )}
+            </VStack>
+          </Container>
         </Box>
       </ChakraProvider>
   );
