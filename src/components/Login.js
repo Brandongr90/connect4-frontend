@@ -13,7 +13,7 @@ const Login = ({ onLogin }) => {
 
     return (
         <Box maxWidth="400px" margin="auto" mt={16} p={8} borderRadius="xl" boxShadow="xl" bg="white">
-            <Heading mb={6} textAlign="center" color="brand.500">Welcome to Connect 4</Heading>
+            <Heading mb={6} textAlign="center" color="brand.500">Choose a Nickname for start to play :)</Heading>
             <form onSubmit={handleSubmit}>
                 <VStack spacing={6}>
                     <Input
