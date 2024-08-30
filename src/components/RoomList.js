@@ -7,8 +7,8 @@ import {
     List,
     ListItem,
     Heading,
-    InputGroup,
-    InputRightElement,
+    /* InputGroup,
+    InputRightElement, */
     useColorModeValue,
     Text,
     Icon,
@@ -18,48 +18,49 @@ import {
 } from '@chakra-ui/react';
 import {MdEmojiPeople, MdDoorSliding, MdLogout} from 'react-icons/md'
 
-const RoomList = ({socket, onJoinRoom, playerName, onLogout}) => {
-    const [rooms, setRooms] = useState([]);
-    const [newRoomName, setNewRoomName] = useState('');
-    const [players, setPlayers] = useState([]);
+const RoomList = ({socket, onJoinRoom, playerName, onLogout}) => {//
+    const [rooms, setRooms] = useState([]);// Declara el estado 'rooms' con un array vacío como valor inicial
+    const [newRoomName, setNewRoomName] = useState('');// Declara el estado 'newRoomName' con un string vacío como valor inicial
+    const [players, setPlayers] = useState([]);// Declara el estado 'players' con un array vacío como valor inicial
 
     useEffect(() => {
-        socket.emit('getRoomList');
-        socket.emit('newPlayer', playerName);
+        socket.emit('getRoomList');// Emite el evento 'getRoomList' al servidor
+        socket.emit('newPlayer', playerName);// Emite el evento 'newPlayer' al servidor
 
-        socket.on('roomList', (roomList) => {
+        socket.on('roomList', (roomList) => {// Escucha el evento 'roomList' y actualiza el estado 'rooms' con el array de salas recibido
             console.log('Received room list:', roomList);
-            setRooms(roomList);
+            setRooms(roomList);// Actualiza el estado 'rooms' con el array de salas recibido
         });
 
-        socket.on('playerList', (playerList) => {
-            setPlayers(playerList);
+        socket.on('playerList', (playerList) => {// Escucha el evento 'playerList' y actualiza el estado 'players' con el array de jugadores recibido
+            setPlayers(playerList);// Actualiza el estado 'players' con el array de jugadores recibido
         });
 
-        return () => {
+        return () => {// Cancela los eventos 'roomList' y 'playerList' cuando el componente se desmonta
             socket.off('roomList');
             socket.off('playerList');
         };
     }, [socket, playerName]);
 
-    const createRoom = () => {
+    const createRoom = () => {// Función para crear una nueva sala
         if (newRoomName.trim()) {
             console.log('Attempting to create room:', newRoomName);
-            socket.emit('createRoom', newRoomName, playerName);
+            socket.emit('createRoom', newRoomName, playerName);// Emite el evento 'createRoom' al servidor
             // setNewRoomName('');
 
-            socket.on('roomCreated', (roomName) => {
+            socket.on('roomCreated', (roomName) => {// Escucha el evento 'roomCreated' y actualiza el estado 'rooms' con el nuevo nombre de la sala
                 console.log('Room created successfully:', roomName);
                 onJoinRoom(roomName); // Redirigir al jugador a la sala creada
-                setNewRoomName('');
+                setNewRoomName('');// Limpia el estado 'newRoomName'    
             });
         }
     };
 
     const bgColor = useColorModeValue('white', 'gray.800');
-    const borderColor = useColorModeValue('gray.200', 'gray.600');
+    /* const borderColor = useColorModeValue('gray.200', 'gray.600'); */
 
     return (
+        // Contenedor principal
         <Box maxWidth="900px" margin="auto" mt={8} p={6} borderRadius="xl" boxShadow="xl" bg={bgColor}>
             <Heading mb={6} textAlign="center" color="brand.500">Game Lobby</Heading>
             <Flex direction={{ base: 'column', md: 'row' }} gap={6}>
@@ -82,6 +83,7 @@ const RoomList = ({socket, onJoinRoom, playerName, onLogout}) => {
                                 Create
                             </Button>
                         </HStack>
+                        {/* Lista de salas disponibles */}
                         <List spacing={3} width="full" overflowY="auto" maxHeight="300px">
                             {rooms.map((room) => (
                                 <ListItem key={room}>
@@ -101,7 +103,7 @@ const RoomList = ({socket, onJoinRoom, playerName, onLogout}) => {
                         </List>
                     </VStack>
                 </Box>
-
+                    {/* Separador vertical entre las salas y los jugadores conectados */}
                 <Divider orientation="vertical" />
 
                 <VStack flex={1} align="stretch">

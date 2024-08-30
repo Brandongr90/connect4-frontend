@@ -2,11 +2,11 @@ import React, { useState } from 'react';
 import { Box, Button, Input, VStack, Heading } from '@chakra-ui/react';
 
 const Login = ({ onLogin }) => {
-    const [nickname, setNickname] = useState('');
+    const [nickname, setNickname] = useState('');// Declara el estado 'nickname' con un valor inicial vacío
 
-    const handleSubmit = (e) => {
+    const handleSubmit = (e) => {// Función para manejar el evento 'submit' del formulario
         e.preventDefault();
-        if (nickname.trim()) {
+        if (nickname.trim()) {// Verifica que el nickname no este vacío
             onLogin(nickname);
         }
     };

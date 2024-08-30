@@ -4,10 +4,10 @@ import { MdLogout } from 'react-icons/md'
 import Connect4Board from './Connect4Board';
 
 const GameRoom = ({ socket, roomName, playerName, onLeaveRoom }) => {
-    const [roomData, setRoomData] = useState(null);
-    const [gameOver, setGameOver] = useState(null);
+    const [roomData, setRoomData] = useState(null);// Declara el estado 'roomData' con un valor inicial de 'null'.
+    const [gameOver, setGameOver] = useState(null);// Declara el estado 'gameOver' con un valor inicial de 'null'.
 
-    useEffect(() => {
+    useEffect(() => {// Escucha los eventos 'roomUpdate', 'gameUpdate' y 'gameOver' y actualiza el estado 'roomData' y 'gameOver' con los datos recibidos.
         socket.on('roomUpdate', (data) => {
             setRoomData(data);
         });
@@ -20,16 +20,16 @@ const GameRoom = ({ socket, roomName, playerName, onLeaveRoom }) => {
             setGameOver(result);
         });
 
-        return () => {
+        return () => {// Cancela los eventos 'roomUpdate', 'gameUpdate' y 'gameOver' cuando el componente se desmonta.
             socket.off('roomUpdate');
             socket.off('gameUpdate');
             socket.off('gameOver');
         };
     }, [socket]);
 
-    const makeMove = (column) => {
-        if (roomData && roomData.game.currentPlayer === roomData.players.findIndex(p => p.name === playerName)) {
-            socket.emit('makeMove', roomName, column);
+    const makeMove = (column) => {// Función para realizar un movimiento.
+        if (roomData && roomData.game.currentPlayer === roomData.players.findIndex(p => p.name === playerName)) {// Verifica si el jugador actual es el que realiza el movimiento.
+            socket.emit('makeMove', roomName, column);// Emite el evento 'makeMove' al servidor.
         }
     };
 
@@ -37,10 +37,11 @@ const GameRoom = ({ socket, roomName, playerName, onLeaveRoom }) => {
         return <Text>Loading...</Text>;
     }
 
-    const isPlayer = roomData.players.some(p => p.name === playerName);
-    const currentPlayerName = roomData.players[roomData.game.currentPlayer]?.name;
+    const isPlayer = roomData.players.some(p => p.name === playerName);// Verifica si el jugador actual es el que realiza el movimiento.
+    const currentPlayerName = roomData.players[roomData.game.currentPlayer]?.name;// Obtiene el nombre del jugador actual.
 
     return (
+        // Contenedor principal de la sala de juego.
         <Box maxWidth="700px" margin="auto" mt={8} p={6} borderRadius="xl" boxShadow="xl" bg="white">
             <VStack spacing={6} align="stretch">
                 <Flex justifyContent="space-between" alignItems="center">
@@ -49,6 +50,7 @@ const GameRoom = ({ socket, roomName, playerName, onLeaveRoom }) => {
                         Leave Room
                     </Button>
                 </Flex>
+                {/* Grid con dos columnas, una para jugadores y otra para espectadores */}
                 <Grid templateColumns="1fr 1fr" gap={4}>
                     <Box>
                         <Text fontWeight="bold">Players:</Text>
@@ -59,6 +61,7 @@ const GameRoom = ({ socket, roomName, playerName, onLeaveRoom }) => {
                         <Text>{roomData.spectators.map(s => s.name).join(', ')}</Text>
                     </Box>
                 </Grid>
+                {/* Si el juego ha terminado, muestra un mensaje */}
                 {gameOver ? (
                     <Alert status="success" variant="subtle" flexDirection="column" alignItems="center" justifyContent="center" textAlign="center" height="200px">
                         <AlertIcon boxSize="40px" mr={0} />
@@ -70,6 +73,7 @@ const GameRoom = ({ socket, roomName, playerName, onLeaveRoom }) => {
                         </AlertDescription>
                     </Alert>
                 ) : (
+                    // Si el juego no ha terminado, muestra el jugador actual
                     <Box textAlign="center" p={4} bg="brand.50" borderRadius="md">
                         <Text fontSize="xl" fontWeight="bold">
                             Current player: {currentPlayerName}
@@ -77,11 +81,13 @@ const GameRoom = ({ socket, roomName, playerName, onLeaveRoom }) => {
                         </Text>
                     </Box>
                 )}
+                {/* Componente Connect4Board que muestra el tablero del juego */}
                 <Connect4Board
                     board={roomData.game.board}
                     onColumnClick={makeMove}
                     currentPlayer={isPlayer ? roomData.game.currentPlayer : null}
                 />
+                {/* Si el usuario es un espectador, muestra un mensaje */}
                 {!isPlayer && (
                     <Box textAlign="center" p={4} bg="gray.100" borderRadius="md">
                         <Text fontSize="lg" fontWeight="bold">
